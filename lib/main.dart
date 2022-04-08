@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:streaming_service/firebase_options.dart';
 import 'package:streaming_service/services/auth_service.dart';
+import 'package:streaming_service/services/napster_service.dart';
 import 'package:streaming_service/ui/pages/auth/landing_login_page.dart';
 import 'package:streaming_service/ui/pages/home/home_page.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
@@ -12,6 +13,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await NapsterService.initialize();
+
   runApp(const MyApp());
 }
 

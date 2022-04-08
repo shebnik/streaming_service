@@ -13,12 +13,21 @@ class AppTheme {
   static ThemeData themeDark = _themeDark.copyWith(
     primaryColor: primaryColor,
     scaffoldBackgroundColor: blackMatte,
+    appBarTheme: const AppBarTheme(
+      color: deepBlack,
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: deepBlack,
+      unselectedItemColor: brightWhite,
+      selectedItemColor: primaryColor,
+    ),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color: primaryColor,
+    ),
     // colorScheme: _colorSchemeLight(_themeLight.colorScheme),
     // appBarTheme: _appBarLight(_themeLight.appBarTheme),
     // textTheme: _textLight(_themeLight.textTheme),
     // buttonTheme: _buttonLight(_themeLight.buttonTheme),
-    // progressIndicatorTheme:
-    //     _progressIndicatorLight(_themeLight.progressIndicatorTheme),
     // cardTheme: _cardLight(_themeLight.cardTheme),
     // bottomNavigationBarTheme:
     //     _bottomAppBarLight(_themeLight.bottomNavigationBarTheme),

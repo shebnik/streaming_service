@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:streaming_service/ui/pages/home/artists_tab.dart';
 import 'package:streaming_service/ui/pages/home/favourites_tab.dart';
 import 'package:streaming_service/ui/pages/home/search_tab.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
+import 'package:streaming_service/ui/pages/home/artists/artists_tab.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
@@ -55,7 +55,6 @@ class _HomePageState extends State<HomePage>
           ),
         ],
         currentIndex: _currentTabIndex,
-        selectedItemColor: AppTheme.primaryColor,
         onTap: (int index) {
           _tabController.index = _currentTabIndex;
           _currentTabIndex = index;
