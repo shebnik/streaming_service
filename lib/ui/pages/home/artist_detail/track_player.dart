@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'package:streaming_service/models/track.dart';
 import 'package:streaming_service/services/napster_service.dart';
-import 'package:streaming_service/ui/pages/home/artists/audio_slider.dart';
+import 'package:streaming_service/ui/pages/home/artist_detail/audio_slider.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
+import 'package:streaming_service/ui/widgets/app_button.dart';
 
 class TrackPlayer extends StatefulWidget {
   const TrackPlayer({
@@ -25,7 +26,8 @@ class _TrackPlayerState extends State<TrackPlayer> {
   AudioPlayer player = AudioPlayer();
 
   final ValueNotifier<bool> _isPlaying = ValueNotifier(true);
-  final ValueNotifier<Duration> duration = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> duration =
+      ValueNotifier(const Duration(seconds: 29));
   final ValueNotifier<Duration> position = ValueNotifier(Duration.zero);
 
   @override
@@ -98,14 +100,10 @@ class _TrackPlayerState extends State<TrackPlayer> {
                       ),
                       Align(
                         alignment: Alignment.bottomLeft,
-                        child: MaterialButton(
+                        child: AppButton(
                           height: 30,
-                          color: AppTheme.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32),
-                          ),
-                          child: const Text('Add to library'),
-                          onPressed: _addToLibrary,
+                          text: 'Add to library',
+                          onPressed: _playTrack,
                         ),
                       )
                     ],
@@ -144,7 +142,6 @@ class _TrackPlayerState extends State<TrackPlayer> {
           child: ValueListenableBuilder<Duration>(
             valueListenable: duration,
             builder: (context, _duration, child) {
-              if (_duration == Duration.zero) return const SizedBox.shrink();
               return ValueListenableBuilder<Duration>(
                 valueListenable: position,
                 builder: (context, _position, child) {
@@ -162,7 +159,9 @@ class _TrackPlayerState extends State<TrackPlayer> {
     );
   }
 
-  void _addToLibrary() {}
+  void _addToLibrary() {
+    // TODO: Add to library
+  }
 
   Future<void> _playTrack() async {
     int result = await player.play(track.previewURL);

@@ -1,11 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:streaming_service/models/artist.dart';
 import 'package:streaming_service/services/auth_service.dart';
 import 'package:streaming_service/services/napster_service.dart';
+import 'package:streaming_service/ui/pages/home/artist_detail/artist_detail.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
 import 'package:streaming_service/ui/widgets/loading_indicator.dart';
-
-import 'artist_detail.dart';
 
 class ArtistsTab extends StatefulWidget {
   const ArtistsTab({Key? key}) : super(key: key);
@@ -15,6 +15,25 @@ class ArtistsTab extends StatefulWidget {
 }
 
 class _ArtistsTabState extends State<ArtistsTab> {
+  ValueNotifier<bool> isLoading = ValueNotifier(true);
+  int currentOffset = 0;
+  List<Artist> artists = [];
+
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+    _loadArtists();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,57 +65,33 @@ class _ArtistsTabState extends State<ArtistsTab> {
           ],
         ),
       ),
-      body: FutureBuilder<List<Artist>>(
-        future: NapsterService.getTopArtists(0),
-        builder: (BuildContext context, AsyncSnapshot<List<Artist>> snapshot) {
-          if (snapshot.hasData) {
-            return GridView.builder(
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        controller: _scrollController,
+        child: Column(
+          children: [
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 1,
                 crossAxisSpacing: 1,
               ),
               padding: const EdgeInsets.all(15),
-              itemCount: snapshot.data!.length,
+              itemCount: artists.length,
               itemBuilder: (BuildContext context, int index) {
-                final Artist artist = snapshot.data![index];
+                final Artist artist = artists[index];
                 return artistCard(artist);
               },
-            );
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          return const Align(
-            alignment: Alignment.topCenter,
-            child: LoadingIndicator(),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget artistCard(Artist artist) {
-    return GestureDetector(
-      onTap: () => _showArtistDetail(artist),
-      child: Card(
-        elevation: 16,
-        semanticContainer: true,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        margin: const EdgeInsets.all(8.0),
-        color: AppTheme.deepBlack,
-        child: Column(
-          children: [
-            Image(
-              image: NetworkImage(NapsterService.getArtistImage(artist.id)),
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(artist.name),
-              ),
+            ValueListenableBuilder<bool>(
+              valueListenable: isLoading,
+              builder: (_, _isLoading, __) {
+                return _isLoading
+                    ? const LoadingIndicator()
+                    : const SizedBox.shrink();
+              },
             ),
           ],
         ),
@@ -104,11 +99,67 @@ class _ArtistsTabState extends State<ArtistsTab> {
     );
   }
 
+  Widget artistCard(Artist artist) {
+    return GestureDetector(
+      onTap: () => _showArtistDetail(artist),
+      child: Hero(
+        tag: artist.id,
+        child: Card(
+          elevation: 16,
+          semanticContainer: true,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          margin: const EdgeInsets.all(8.0),
+          color: AppTheme.deepBlack,
+          child: Column(
+            children: [
+              Image.network(
+                NapsterService.getArtistImage(artist.id),
+                fit: BoxFit.cover,
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(artist.name),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      _loadMore();
+    }
+  }
+
   void _showArtistDetail(Artist artist) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ArtistDetail(artist: artist),
+        builder: (_) => ArtistDetail(artist: artist),
       ),
     );
+  }
+
+  Future<void> _loadMore() async {
+    if (isLoading.value) return;
+    isLoading.value = true;
+    currentOffset += 10;
+    await _loadArtists();
+  }
+
+  Future<void> _loadArtists() async {
+    artists.addAll(
+      await NapsterService.getTopArtists(currentOffset),
+    );
+    isLoading = ValueNotifier(false);
+    setState(() {});
   }
 }
