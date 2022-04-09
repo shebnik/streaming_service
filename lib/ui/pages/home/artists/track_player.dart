@@ -1,17 +1,45 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import 'package:streaming_service/models/track.dart';
 import 'package:streaming_service/services/napster_service.dart';
+import 'package:streaming_service/ui/pages/home/artists/audio_slider.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
 
-class TrackPlayer extends StatelessWidget {
+class TrackPlayer extends StatefulWidget {
   const TrackPlayer({
     Key? key,
     required this.track,
   }) : super(key: key);
 
   final Track track;
+
+  @override
+  State<TrackPlayer> createState() => _TrackPlayerState();
+}
+
+class _TrackPlayerState extends State<TrackPlayer> {
+  late final Track track;
+
+  AudioPlayer player = AudioPlayer();
+
+  final ValueNotifier<bool> _isPlaying = ValueNotifier(true);
+  final ValueNotifier<Duration> duration = ValueNotifier(Duration.zero);
+  final ValueNotifier<Duration> position = ValueNotifier(Duration.zero);
+
+  @override
+  void initState() {
+    super.initState();
+    track = widget.track;
+    _playTrack();
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +105,7 @@ class TrackPlayer extends StatelessWidget {
                             borderRadius: BorderRadius.circular(32),
                           ),
                           child: const Text('Add to library'),
-                          onPressed: () => {},
+                          onPressed: _addToLibrary,
                         ),
                       )
                     ],
@@ -86,18 +114,75 @@ class TrackPlayer extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            Row(
-              children: const [
-                Icon(
-                  Icons.play_circle_outline,
-                  size: 28,
-                  color: AppTheme.primaryColor,
-                ),
-              ],
-            ),
+            _trackControls(),
           ],
         ),
       ),
     );
+  }
+
+  Widget _trackControls() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: _handlePlayPause,
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _isPlaying,
+            builder: (context, isPlaying, child) {
+              return Icon(
+                isPlaying
+                    ? Icons.pause_circle_outline
+                    : Icons.play_circle_outline,
+                color: AppTheme.primaryColor,
+                size: 50,
+              );
+            },
+          ),
+        ),
+        Expanded(
+          child: ValueListenableBuilder<Duration>(
+            valueListenable: duration,
+            builder: (context, _duration, child) {
+              if (_duration == Duration.zero) return const SizedBox.shrink();
+              return ValueListenableBuilder<Duration>(
+                valueListenable: position,
+                builder: (context, _position, child) {
+                  return AudioSlider(
+                    controller: player,
+                    duration: _duration,
+                    position: _position,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _addToLibrary() {}
+
+  Future<void> _playTrack() async {
+    int result = await player.play(track.previewURL);
+    if (result == 1) {
+      player.onDurationChanged.listen((Duration d) => duration.value = d);
+      player.onAudioPositionChanged.listen((Duration p) => position.value = p);
+      player.onPlayerStateChanged.listen((PlayerState s) {
+        if (s == PlayerState.COMPLETED) {
+          _isPlaying.value = false;
+        }
+      });
+    }
+  }
+
+  void _handlePlayPause() {
+    if (_isPlaying.value) {
+      player.pause();
+    } else {
+      player.resume();
+    }
+    _isPlaying.value = !_isPlaying.value;
   }
 }
