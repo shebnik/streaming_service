@@ -1,10 +1,10 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:streaming_service/models/artist.dart';
 import 'package:streaming_service/services/auth_service.dart';
 import 'package:streaming_service/services/napster_service.dart';
 import 'package:streaming_service/ui/pages/home/artist_detail/artist_detail.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
+import 'package:streaming_service/ui/widgets/app_app_bar.dart';
 import 'package:streaming_service/ui/widgets/loading_indicator.dart';
 
 class ArtistsTab extends StatefulWidget {
@@ -14,12 +14,16 @@ class ArtistsTab extends StatefulWidget {
   _ArtistsTabState createState() => _ArtistsTabState();
 }
 
-class _ArtistsTabState extends State<ArtistsTab> {
+class _ArtistsTabState extends State<ArtistsTab>
+    with AutomaticKeepAliveClientMixin {
   ValueNotifier<bool> isLoading = ValueNotifier(true);
   int currentOffset = 0;
   List<Artist> artists = [];
 
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -36,34 +40,25 @@ class _ArtistsTabState extends State<ArtistsTab> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          toolbarHeight: 80.0,
-          title: const Padding(
-            padding: EdgeInsets.only(left: 25),
-            child: Text(
-              'Artists',
-              style: TextStyle(color: Colors.white, fontSize: 24),
-            ),
+      appBar: AppAppBar(
+        title: "Artists",
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'logout') {
+                AuthService.signOut();
+              }
+            },
+            itemBuilder: (BuildContext context) => const [
+              PopupMenuItem(
+                value: 'logout',
+                child: Text('Log out'),
+              ),
+            ],
           ),
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: (String value) {
-                if (value == 'logout') {
-                  AuthService.signOut();
-                }
-              },
-              itemBuilder: (BuildContext context) => const [
-                PopupMenuItem(
-                  value: 'logout',
-                  child: Text('Log out'),
-                ),
-              ],
-            ),
-          ],
-        ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

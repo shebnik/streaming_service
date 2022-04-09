@@ -24,6 +24,12 @@ class AppTheme {
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: primaryColor,
     ),
+    inputDecorationTheme: const InputDecorationTheme(
+      iconColor: primaryColor,
+      labelStyle: TextStyle(
+        color: brightWhite,
+      ),
+    ),
     // colorScheme: _colorSchemeLight(_themeLight.colorScheme),
     // appBarTheme: _appBarLight(_themeLight.appBarTheme),
     // textTheme: _textLight(_themeLight.textTheme),

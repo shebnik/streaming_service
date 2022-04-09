@@ -9,7 +9,7 @@ import 'package:streaming_service/models/track.dart';
 
 class NapsterService {
   static late final String NAPSTER_API_KEY;
-  static const String API_BASE = 'https://api.napster.com/v2.2/';
+  static const String API_BASE = 'https://api.napster.com/v2.2';
   static const String topArtists = 'artists/top?limit=10';
 
   static const imageSizes = {
@@ -33,11 +33,6 @@ class NapsterService {
       throw Exception('Failed to make napster api call');
     }
   }
-
-  // static Future<String> napsterEndpointCall(String endpoint) {
-  //   final url = '$API_BASE/$endpoint';
-  //   return makeApiCall(url);
-  // }
 
   static Future<List<Artist>> getTopArtists(int offset) async {
     final url = '$API_BASE/$topArtists&offset=$offset';
@@ -68,5 +63,15 @@ class NapsterService {
     return 'https://api.napster.com/imageserver/v2/albums/' +
         albumId +
         '/images/170x170.jpg';
+  }
+
+  static Future<List<Artist>> searchArtist(String query, int offset) async {
+    final url =
+        '$API_BASE/search?query=$query&type=artist&per_type_limit=5&offset=$offset';
+    final data = jsonDecode(await makeApiCall(url));
+    return data['search']['data']['artists']
+        .map((artist) => Artist.fromMap(artist))
+        .toList()
+        .cast<Artist>();
   }
 }
