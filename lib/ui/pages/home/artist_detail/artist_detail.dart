@@ -4,6 +4,7 @@ import 'package:streaming_service/models/artist.dart';
 import 'package:streaming_service/services/napster_service.dart';
 import 'package:streaming_service/ui/pages/home/artist_detail/tracks_list.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
+import 'package:streaming_service/ui/widgets/app_image.dart';
 
 class ArtistDetail extends StatefulWidget {
   const ArtistDetail({
@@ -42,12 +43,8 @@ class _ArtistDetailState extends State<ArtistDetail> {
               background: Stack(
                 children: [
                   Positioned.fill(
-                    child: Hero(
-                      tag: artist.id,
-                      child: Image.network(
-                        NapsterService.getArtistImage(artist.id, 'large'),
-                        fit: BoxFit.cover,
-                      ),
+                    child: AppImage(
+                      url: NapsterService.getArtistImage(artist.id, 'large'),
                     ),
                   ),
                   Opacity(
@@ -65,8 +62,10 @@ class _ArtistDetailState extends State<ArtistDetail> {
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  Text(artist.blurbs.join("\n\n")),
-                  const SizedBox(height: 25),
+                  if (artist.blurbs.isNotEmpty) ...[
+                    Text(artist.blurbs.join("\n\n")),
+                    const SizedBox(height: 25),
+                  ],
                   TracksList(artistId: artist.id),
                 ],
               ),

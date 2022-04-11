@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.deepBlack,
+      resizeToAvoidBottomInset: false,
       body: TabBarView(
         controller: _tabController,
         children: const [

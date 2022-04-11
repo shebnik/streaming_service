@@ -6,6 +6,7 @@ import 'package:streaming_service/services/napster_service.dart';
 import 'package:streaming_service/ui/pages/home/artist_detail/track_player.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
 import 'package:streaming_service/ui/widgets/app_button.dart';
+import 'package:streaming_service/ui/widgets/app_image.dart';
 import 'package:streaming_service/ui/widgets/loading_indicator.dart';
 
 class TracksList extends StatefulWidget {
@@ -81,8 +82,11 @@ class _TracksListState extends State<TracksList> {
           height: 65,
           child: Row(
             children: [
-              Image.network(
-                NapsterService.getTrackImage(track.albumId),
+              SizedBox(
+                width: 65,
+                child: AppImage(
+                  url: NapsterService.getTrackImage(track.albumId),
+                ),
               ),
               Expanded(
                 child: Padding(

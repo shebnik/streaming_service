@@ -7,6 +7,7 @@ import 'package:streaming_service/services/napster_service.dart';
 import 'package:streaming_service/ui/pages/home/artist_detail/audio_slider.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
 import 'package:streaming_service/ui/widgets/app_button.dart';
+import 'package:streaming_service/ui/widgets/app_image.dart';
 
 class TrackPlayer extends StatefulWidget {
   const TrackPlayer({
@@ -60,8 +61,8 @@ class _TrackPlayerState extends State<TrackPlayer> {
                   height: 100,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
-                    child: Image.network(
-                      NapsterService.getTrackImage(track.albumId),
+                    child: AppImage(
+                      url: NapsterService.getTrackImage(track.albumId),
                     ),
                   ),
                 ),

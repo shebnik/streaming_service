@@ -65,7 +65,7 @@ class NapsterService {
         '/images/170x170.jpg';
   }
 
-  static Future<List<Artist>> searchArtist(String query, int offset) async {
+  static Future<List<Artist>> searchArtists(String query, int offset) async {
     final url =
         '$API_BASE/search?query=$query&type=artist&per_type_limit=5&offset=$offset';
     final data = jsonDecode(await makeApiCall(url));
