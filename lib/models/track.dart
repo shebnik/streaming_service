@@ -1,15 +1,35 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:hive/hive.dart';
 
-class Track {
+part 'track.g.dart';
+
+@HiveType(typeId: 0)
+class Track extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String artistId;
+
+  @HiveField(3)
   final String artistName;
+
+  @HiveField(4)
   final String albumName;
+
+  @HiveField(5)
   final String albumId;
+
+  @HiveField(6)
   final String previewURL;
-  
+
+  @HiveField(7)
+  final DateTime? timeWhenAddedToFavourites;
+
   Track({
     required this.id,
     required this.name,
@@ -18,6 +38,7 @@ class Track {
     required this.albumName,
     required this.albumId,
     required this.previewURL,
+    this.timeWhenAddedToFavourites,
   });
 
   Track copyWith({
@@ -28,6 +49,7 @@ class Track {
     String? albumName,
     String? albumId,
     String? previewURL,
+    DateTime? timeWhenAddedToFavourites,
   }) {
     return Track(
       id: id ?? this.id,
@@ -37,6 +59,7 @@ class Track {
       albumName: albumName ?? this.albumName,
       albumId: albumId ?? this.albumId,
       previewURL: previewURL ?? this.previewURL,
+      timeWhenAddedToFavourites: timeWhenAddedToFavourites ?? this.timeWhenAddedToFavourites,
     );
   }
 
@@ -66,35 +89,36 @@ class Track {
 
   String toJson() => json.encode(toMap());
 
-  factory Track.fromJson(String source) => Track.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Track.fromJson(String source) =>
+      Track.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Track(id: $id, name: $name, artistId: $artistId, artistName: $artistName, albumName: $albumName, albumId: $albumId, previewURL: $previewURL)';
+    return 'Track(id: $id, name: $name, artistId: $artistId, artistName: $artistName, albumName: $albumName, albumId: $albumId, previewURL: $previewURL, timeWhenAddedToFavourites: $timeWhenAddedToFavourites)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is Track &&
-      other.id == id &&
-      other.name == name &&
-      other.artistId == artistId &&
-      other.artistName == artistName &&
-      other.albumName == albumName &&
-      other.albumId == albumId &&
-      other.previewURL == previewURL;
+        other.id == id &&
+        other.name == name &&
+        other.artistId == artistId &&
+        other.artistName == artistName &&
+        other.albumName == albumName &&
+        other.albumId == albumId &&
+        other.previewURL == previewURL;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      artistId.hashCode ^
-      artistName.hashCode ^
-      albumName.hashCode ^
-      albumId.hashCode ^
-      previewURL.hashCode;
+        name.hashCode ^
+        artistId.hashCode ^
+        artistName.hashCode ^
+        albumName.hashCode ^
+        albumId.hashCode ^
+        previewURL.hashCode;
   }
 }

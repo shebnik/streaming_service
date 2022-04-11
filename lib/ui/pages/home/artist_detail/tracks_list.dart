@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'package:streaming_service/models/track.dart';
 import 'package:streaming_service/services/napster_service.dart';
-import 'package:streaming_service/ui/pages/home/artist_detail/track_player.dart';
-import 'package:streaming_service/ui/theme/app_theme.dart';
 import 'package:streaming_service/ui/widgets/app_button.dart';
-import 'package:streaming_service/ui/widgets/app_image.dart';
 import 'package:streaming_service/ui/widgets/loading_indicator.dart';
+import 'package:streaming_service/ui/widgets/track_card.dart';
 
 class TracksList extends StatefulWidget {
   const TracksList({
@@ -45,10 +43,9 @@ class _TracksListState extends State<TracksList> {
           itemCount: tracks.length,
           separatorBuilder: (BuildContext context, int index) =>
               const SizedBox(height: 15),
-          itemBuilder: (BuildContext context, int index) {
-            final Track track = tracks[index];
-            return trackCard(track);
-          },
+          itemBuilder: (BuildContext context, int index) => TrackCard(
+            track: tracks[index],
+          ),
         ),
         const SizedBox(height: 25),
         ValueListenableBuilder<bool>(
@@ -65,75 +62,6 @@ class _TracksListState extends State<TracksList> {
           },
         ),
       ],
-    );
-  }
-
-  Widget trackCard(Track track) {
-    return GestureDetector(
-      onTap: () => _playTrack(track),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        color: AppTheme.blackMatte,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        margin: EdgeInsets.zero,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 65,
-                child: AppImage(
-                  url: NapsterService.getTrackImage(track.albumId),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        track.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        track.albumName,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: AppTheme.grayMiddle,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(right: 19),
-                child: Icon(
-                  Icons.play_circle_outline,
-                  size: 28,
-                  color: AppTheme.primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _playTrack(Track track) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) => TrackPlayer(track: track),
     );
   }
 

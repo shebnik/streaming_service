@@ -20,11 +20,11 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 3)
-      ..addListener(() {
-        _currentTabIndex = _tabController.index;
-        setState(() {});
-      });
+    _tabController = TabController(vsync: this, length: 3);
+    // ..addListener(() {
+    //   _currentTabIndex = _tabController.index;
+    //   setState(() {});
+    // });
   }
 
   @override
@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage>
       resizeToAvoidBottomInset: false,
       body: TabBarView(
         controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
         children: const [
           ArtistsTab(),
           SearchTab(),
