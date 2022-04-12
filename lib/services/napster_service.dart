@@ -80,8 +80,7 @@ class NapsterService {
     final data = jsonDecode(await makeApiCall(url));
     try {
       return Track.fromMap(data['tracks'][0]);
-    } on Exception catch (e) {
-      print(e);
+    } on Exception {
       return null;
     }
   }

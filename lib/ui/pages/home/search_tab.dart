@@ -51,7 +51,6 @@ class _SearchTabState extends State<SearchTab>
   }
 
   Future<void> _doSearch(String query) async {
-    print("Searching for $query");
     this.query = query;
     artists.value = [];
     setState(() {});

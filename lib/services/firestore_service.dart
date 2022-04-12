@@ -23,8 +23,8 @@ class FirestoreService {
   static Future<bool> userExists(String id) =>
       _users.doc(id).get().then((doc) => doc.exists);
 
-  static Future<void> addToFavourites(Track track) {
-    return _users.doc(AuthService.getUserId()).update({
+  static Future<void> addToFavourites(Track track) async {
+    return await _users.doc(AuthService.getUserId()).update({
       'favouriteTracks': FieldValue.arrayUnion([
         FavouriteTrack(
           id: track.id,
@@ -34,8 +34,8 @@ class FirestoreService {
     });
   }
 
-  static Future<void> removeFromFavourites(Track track) {
-    return _users.doc(AuthService.getUserId()).update({
+  static Future<void> removeFromFavourites(Track track) async {
+    return await _users.doc(AuthService.getUserId()).update({
       'favouriteTracks': FieldValue.arrayRemove([
         FavouriteTrack(
           id: track.id,

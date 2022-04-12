@@ -194,8 +194,8 @@ class _TrackPlayerState extends State<TrackPlayer> {
   Future<void> _addToFavourites() async {
     if (favouritesBox!.containsKey(track.id)) {
       buttonName.value = 'Add to favourites';
-      await favouritesBox!.delete(track.id);
       await FirestoreService.removeFromFavourites(favouritesBox!.get(track.id)!);
+      await favouritesBox!.delete(track.id);
     } else {
       Track favouriteTrack = track.copyWith(
         timeWhenAddedToFavourites: DateTime.now(),
