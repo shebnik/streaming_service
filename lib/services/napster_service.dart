@@ -74,4 +74,24 @@ class NapsterService {
         .toList()
         .cast<Artist>();
   }
+
+  static Future<Track?> getTrack(String trackId) async {
+    final url = 'https://api.napster.com/v2.2/tracks/$trackId';
+    final data = jsonDecode(await makeApiCall(url));
+    try {
+      return Track.fromMap(data['tracks'][0]);
+    } on Exception catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  static Future<List<Track>> getTracks(List<String> trackIds) async {
+    final url = 'https://api.napster.com/v2.2/tracks/${trackIds.join(',')}';
+    final data = jsonDecode(await makeApiCall(url));
+    return data['tracks']
+        .map((track) => Track.fromMap(track))
+        .toList()
+        .cast<Track>();
+  }
 }

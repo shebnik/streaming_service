@@ -2,9 +2,9 @@
     package="com.example.streaming_service">
    <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="streaming_service"
+        android:label="Spotidemo"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
    	    <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>

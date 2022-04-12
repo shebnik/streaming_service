@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:streaming_service/services/auth_service.dart';
+import 'package:streaming_service/services/utils.dart';
 import 'package:streaming_service/ui/pages/auth/create_account_page.dart';
 import 'package:streaming_service/ui/pages/auth/login_page.dart';
 import 'package:streaming_service/ui/widgets/sign_in_button/sign_in_button.dart';
@@ -28,12 +29,12 @@ class LandingLoginPage extends StatelessWidget {
               const SizedBox(height: 50),
               SignInButton(
                 Buttons.Google,
-                onPressed: () => AuthService.signInGoogle(context),
+                onPressed: () => socialSignIn(AuthType.google),
               ),
               const SizedBox(height: 10),
               SignInButton(
                 Buttons.Facebook,
-                onPressed: () => AuthService.signInFacebook(),
+                onPressed: () => socialSignIn(AuthType.facebook),
               ),
               const SizedBox(height: 10),
               SignInButton(
@@ -75,5 +76,12 @@ class LandingLoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> socialSignIn(AuthType authType) async {
+    String? errorMessage = await AuthService.signIn(authType);
+    if (errorMessage != null) {
+      Utils.openSnackBar(errorMessage);
+    }
   }
 }

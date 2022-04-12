@@ -5,8 +5,16 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:streaming_service/models/app_user.dart';
 import 'package:streaming_service/services/firestore_service.dart';
+import 'package:streaming_service/services/hive_service.dart';
 import 'package:streaming_service/ui/pages/auth/landing_login_page.dart';
 import 'package:streaming_service/ui/pages/home/home_page.dart';
+
+enum AuthType {
+  createAccount,
+  login,
+  facebook,
+  google,
+}
 
 class AuthService {
   static final FirebaseAuth _instance = FirebaseAuth.instance;
@@ -25,76 +33,86 @@ class AuthService {
     });
   }
 
-  static Future<String?> createAccount(String email, String password) async {
+  static Future<void> signOut() async {
+    FirestoreService.detachListener();
+    await HiveService.getFavouritesBox().then((value) => value.clear());
+    await _instance.signOut();
+  }
+
+  static Future<String?> signIn(
+    AuthType authType, {
+    String? email,
+    String? password,
+  }) async {
+    UserCredential? userCredential;
     try {
-      UserCredential userCredential =
-          await _instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = userCredential.user;
-      if (user == null) return 'Create account error';
-      await FirestoreService.addUser(
-        AppUser(
-          uid: user.uid,
-          email: user.email ?? '',
-        ),
-      );
+      // Email and password sign in
+      if (authType == AuthType.createAccount || authType == AuthType.login) {
+        if (email == null && password == null) {
+          return "Email and password are required";
+        }
+        userCredential = authType == AuthType.createAccount
+            ? await _instance.createUserWithEmailAndPassword(
+                email: email!,
+                password: password!,
+              )
+            : await _instance.signInWithEmailAndPassword(
+                email: email!,
+                password: password!,
+              );
+      }
+      // Facebook sign in
+      else if (authType == AuthType.facebook) {
+        userCredential = await _signInWithFacebook();
+      }
+      // Google sign in
+      else if (authType == AuthType.google) {
+        userCredential = await _signInWithGoogle();
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         return 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
         return 'The account already exists for that email.';
-      }
-    } catch (e) {
-      return e.toString();
-    }
-    return null;
-  }
-
-  static Future<String?> login(String email, String password) async {
-    try {
-      await _instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      } else if (e.code == 'user-not-found') {
         return 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
         return 'Wrong password provided for that user.';
       }
-      return e.message.toString();
+      return e.message;
     }
+
+    if (userCredential == null || userCredential.user == null) {
+      return "Login failed. Please try again later.";
+    }
+
+    final User user = userCredential.user!;
+    final bool exists = await FirestoreService.userExists(user.uid);
+    if (!exists) {
+      await FirestoreService.addUser(
+        AppUser(
+          uid: user.uid,
+          email: user.email ?? '',
+          favouriteTracks: [],
+        ),
+      );
+    }
+    FirestoreService.setupListener();
     return null;
   }
 
-  static Future<bool> signInFacebook() async {
-    UserCredential? userCredential;
+  static Future<UserCredential> _signInWithFacebook() async {
     if (kIsWeb) {
-      userCredential = await _signInWithFacebookWeb();
-    } else {
-      userCredential = await _signInWithFacebook();
-    }
-    if (userCredential == null) return false;
-    User? user = userCredential.user;
-    if (user == null) {
-      // AppUtils.showSnackBar(context, 'Login error');
-      return false;
-    }
-    await FirestoreService.addUser(
-      AppUser(
-        uid: user.uid,
-        email: user.email ?? '',
-      ),
-    );
-    return true;
-  }
+      FacebookAuthProvider facebookProvider = FacebookAuthProvider();
 
-  static Future<UserCredential?> _signInWithFacebook() async {
+      facebookProvider.addScope('email');
+      facebookProvider.setCustomParameters({
+        'display': 'popup',
+      });
+
+      return FirebaseAuth.instance.signInWithPopup(facebookProvider);
+    }
     final LoginResult loginResult = await FacebookAuth.instance.login();
-
-    if (loginResult.accessToken == null) return null;
 
     final OAuthCredential facebookAuthCredential =
         FacebookAuthProvider.credential(loginResult.accessToken!.token);
@@ -102,71 +120,27 @@ class AuthService {
     return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
   }
 
-  static Future<UserCredential?> _signInWithFacebookWeb() async {
-    FacebookAuthProvider facebookProvider = FacebookAuthProvider();
-
-    facebookProvider.addScope('email');
-    facebookProvider.setCustomParameters({
-      'display': 'popup',
-    });
-
-    return await FirebaseAuth.instance.signInWithPopup(facebookProvider);
-  }
-
-  static Future<bool> signInGoogle(BuildContext context) async {
-    UserCredential? userCredential;
+  static Future<UserCredential> _signInWithGoogle() async {
     if (kIsWeb) {
-      userCredential = await _signInWithGoogleWeb();
-    } else {
-      userCredential = await _signInWithGoogle();
-    }
-    if (userCredential == null) return false;
-    User? user = userCredential.user;
-    if (user == null) {
-      // AppUtils.showSnackBar(context, 'Login error');
-      return false;
-    }
-    await FirestoreService.addUser(
-      AppUser(
-        uid: user.uid,
-        email: user.email ?? '',
-      ),
-    );
-    return true;
-  }
+      GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
-  static Future<UserCredential?> _signInWithGoogle() async {
+      googleProvider
+          .addScope('https://www.googleapis.com/auth/contacts.readonly');
+      googleProvider.setCustomParameters({
+        'login_hint': 'user@example.com',
+      });
+
+      return FirebaseAuth.instance.signInWithPopup(googleProvider);
+    }
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     final GoogleSignInAuthentication? googleAuth =
         await googleUser?.authentication;
 
-    final credential = GoogleAuthProvider.credential(
+    final OAuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
-    try {
-      return await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    return FirebaseAuth.instance.signInWithCredential(credential);
   }
-
-  static Future<UserCredential?> _signInWithGoogleWeb() async {
-    GoogleAuthProvider googleProvider = GoogleAuthProvider();
-
-    googleProvider
-        .addScope('https://www.googleapis.com/auth/contacts.readonly');
-    googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
-
-    try {
-      return await FirebaseAuth.instance.signInWithPopup(googleProvider);
-    } catch (e) {
-      print(e);
-    }
-    return null;
-  }
-
-  static Future<void> signOut() async => await _instance.signOut();
 }

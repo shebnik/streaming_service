@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:streaming_service/models/track.dart';
+import 'package:streaming_service/services/firestore_service.dart';
 import 'package:streaming_service/services/hive_service.dart';
 import 'package:streaming_service/services/napster_service.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
@@ -190,16 +191,18 @@ class _TrackPlayerState extends State<TrackPlayer> {
     );
   }
 
-  void _addToFavourites() {
+  Future<void> _addToFavourites() async {
     if (favouritesBox!.containsKey(track.id)) {
-      favouritesBox!.delete(track.id);
       buttonName.value = 'Add to favourites';
+      await favouritesBox!.delete(track.id);
+      await FirestoreService.removeFromFavourites(favouritesBox!.get(track.id)!);
     } else {
       Track favouriteTrack = track.copyWith(
         timeWhenAddedToFavourites: DateTime.now(),
       );
-      favouritesBox!.put(track.id, favouriteTrack);
       buttonName.value = 'Remove from favourites';
+      await favouritesBox!.put(track.id, favouriteTrack);
+      await FirestoreService.addToFavourites(favouriteTrack);
     }
   }
 

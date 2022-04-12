@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:streaming_service/models/track.dart';
+import 'package:streaming_service/services/firestore_service.dart';
 import 'package:streaming_service/services/hive_service.dart';
 import 'package:streaming_service/services/utils.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
@@ -110,7 +111,8 @@ class _FavouritesTabState extends State<FavouritesTab>
       const AreYouSureDialog(message: "Are you sure want to remove track?"),
     );
     if (value != null && value == true) {
-      favouritesBox!.delete(track.id);
+      await favouritesBox!.delete(track.id);
+      await FirestoreService.removeFromFavourites(track);
       setState(() => {});
       return true;
     }

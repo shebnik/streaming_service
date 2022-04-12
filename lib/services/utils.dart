@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:streaming_service/ui/theme/app_theme.dart';
+
+
+final GlobalKey<ScaffoldMessengerState> snackbarKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 class Utils {
   static bool isEmail(String email) {
@@ -7,7 +12,7 @@ class Utils {
         .hasMatch(email);
   }
 
-  static openBottomSheet(BuildContext context, Widget bottomSheet) {
+  static void openBottomSheet(BuildContext context, Widget bottomSheet) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -29,6 +34,28 @@ class Utils {
       builder: (BuildContext context) {
         return dialog;
       },
+    );
+  }
+
+  static void openSnackBar(String message) {
+    snackbarKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        // snackStyle: SnackStyle.GROUNDED,
+        // snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppTheme.primaryColor,
+        duration: const Duration(seconds: 5),
+        // mainButton: TextButton(
+        //   onPressed: onPressed ?? () => Get.back(),
+        //   child: Text(
+        //     buttonText ?? 'OK',
+        //     style: const TextStyle(
+        //       color: AppTheme.primary,
+        //       fontWeight: FontWeight.bold,
+        //     ),
+        //   ),
+        // ),
+      ),
     );
   }
 }

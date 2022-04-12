@@ -42,9 +42,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     errorText.value = "";
     buttonEnabled.value = false;
     buttonText.value = "Creating account...";
-    String? errorMessage = await AuthService.createAccount(
-      _emailController.text,
-      _passwordController.text,
+    String? errorMessage = await AuthService.signIn(
+      AuthType.createAccount,
+      email: _emailController.text,
+      password: _passwordController.text,
     );
     buttonText.value = "Create account";
     if (errorMessage != null) {

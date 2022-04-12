@@ -42,9 +42,10 @@ class _LoginPageState extends State<LoginPage> {
     errorText.value = "";
     buttonEnabled.value = false;
     buttonText.value = "Logging in...";
-    String? errorMessage = await AuthService.login(
-      _emailController.text,
-      _passwordController.text,
+    String? errorMessage = await AuthService.signIn(
+      AuthType.login,
+      email: _emailController.text,
+      password: _passwordController.text,
     );
     buttonText.value = "Log in";
     if (errorMessage != null) {
