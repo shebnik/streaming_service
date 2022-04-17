@@ -3,12 +3,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:streaming_service/models/track.dart';
 import 'package:streaming_service/services/firestore_service.dart';
 import 'package:streaming_service/services/hive_service.dart';
-import 'package:streaming_service/services/utils.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
 import 'package:streaming_service/ui/widgets/app_app_bar.dart';
 import 'package:streaming_service/ui/widgets/dialogs/are_you_sure_dialog.dart';
 import 'package:streaming_service/ui/widgets/loading_indicator.dart';
 import 'package:streaming_service/ui/widgets/track_card.dart';
+import 'package:streaming_service/services/extensions.dart';
 
 class FavouritesTab extends StatefulWidget {
   const FavouritesTab({Key? key}) : super(key: key);
@@ -106,10 +106,10 @@ class _FavouritesTabState extends State<FavouritesTab>
   }
 
   Future<bool> _onDismissed(Track track) async {
-    bool? value = await Utils.openDialog(
-      context,
-      const AreYouSureDialog(message: "Are you sure want to remove track?"),
-    );
+    bool? value =
+        await const AreYouSureDialog(message: "Are you sure want to remove track?")
+            .showWidgetAsDialog(context);
+
     if (value != null && value == true) {
       await favouritesBox!.delete(track.id);
       await FirestoreService.removeFromFavourites(track);

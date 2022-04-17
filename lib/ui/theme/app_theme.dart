@@ -30,14 +30,5 @@ class AppTheme {
         color: brightWhite,
       ),
     ),
-    // colorScheme: _colorSchemeLight(_themeLight.colorScheme),
-    // appBarTheme: _appBarLight(_themeLight.appBarTheme),
-    // textTheme: _textLight(_themeLight.textTheme),
-    // buttonTheme: _buttonLight(_themeLight.buttonTheme),
-    // cardTheme: _cardLight(_themeLight.cardTheme),
-    // bottomNavigationBarTheme:
-    //     _bottomAppBarLight(_themeLight.bottomNavigationBarTheme),
-    // chipTheme: _chipLight(_themeLight.chipTheme),
-    // dialogBackgroundColor: Colors.grey,
   );
 }

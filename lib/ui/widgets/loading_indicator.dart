@@ -17,12 +17,5 @@ class LoadingIndicator extends StatelessWidget {
         ),
       ),
     );
-    // return const Align(
-    //   alignment: Alignment.topCenter,
-    //   child: Padding(
-    //     padding: EdgeInsets.only(top: 25.0),
-    //     child: CircularProgressIndicator(),
-    //   ),
-    // );
   }
 }

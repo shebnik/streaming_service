@@ -24,9 +24,6 @@ class TrackCard extends StatelessWidget {
         builder: (BuildContext context) => TrackPlayer(track: track),
       ),
       child: Card(
-        // shape: RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.circular(10.0),
-        // ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(10),

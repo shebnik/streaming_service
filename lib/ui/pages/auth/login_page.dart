@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:streaming_service/services/auth_service.dart';
-import 'package:streaming_service/services/utils.dart';
+import 'package:streaming_service/services/extensions.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
 import 'package:streaming_service/ui/widgets/app_text_field.dart';
 
@@ -34,8 +34,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void textChanged() {
-    buttonEnabled.value = Utils.isEmail(_emailController.text) &&
-        _passwordController.text.length > 5;
+    buttonEnabled.value = _emailController.text.isEmail() &&
+        _passwordController.text.isPassword();
   }
 
   Future<void> _login() async {

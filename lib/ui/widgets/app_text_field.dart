@@ -121,12 +121,6 @@ class _AppTextFieldState extends State<AppTextField> {
 
   String? getHintText() {
     switch (widget.fieldType) {
-      // case FieldType.name:
-      //   return "";
-      // case FieldType.age:
-      //   return "";
-      // case FieldType.phoneNumber:
-      //   return "";
       case FieldType.creditCardNumber:
         return "XXXX XXXX XXXX XXXX";
       case FieldType.creditCardDueTo:

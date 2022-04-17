@@ -5,7 +5,7 @@ import 'package:streaming_service/services/auth_service.dart';
 import 'package:streaming_service/services/firestore_service.dart';
 import 'package:streaming_service/services/hive_service.dart';
 import 'package:streaming_service/services/napster_service.dart';
-import 'package:streaming_service/services/utils.dart';
+import 'package:streaming_service/services/extensions.dart';
 import 'package:streaming_service/ui/pages/auth/landing_login_page.dart';
 import 'package:streaming_service/ui/pages/home/home_page.dart';
 import 'package:streaming_service/ui/theme/app_theme.dart';
